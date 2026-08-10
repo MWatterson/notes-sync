@@ -43,7 +43,20 @@ jobs:
           files=$(for f in out/*; do
                     jq -n --arg n "$(basename "$f")" --rawfile c "$f" '{($n): {content: $c}}'
                   done | jq -s 'add')
-          code=$(jq -n --argjson files "$files" '{files: $files}' \
+
+          # Files that exist in the gist but no longer in users.txt are revoked:
+          # PATCHing them to null deletes them. gistfile1.txt is the anchor a
+          # gist needs to keep existing, so it is never touched.
+          curl -sS -H "Authorization: Bearer $GIST_TOKEN" \
+               -H "Accept: application/vnd.github+json" \
+               "https://api.github.com/gists/$GIST_ID" \
+            | jq -r '.files | keys[]' | sort > gist.current
+          ls out | sort > gist.wanted
+          revoked=$(comm -23 gist.current gist.wanted | grep -vx 'gistfile1.txt' || true)
+          for r in $revoked; do echo "revoking $r"; done
+          nulls=$(for r in $revoked; do jq -n --arg n "$r" '{($n): null}'; done | jq -s 'add // {}')
+
+          code=$(jq -n --argjson a "$files" --argjson b "$nulls" '{files: ($a + $b)}' \
                  | curl -sS -X PATCH \
                      -H "Authorization: Bearer $GIST_TOKEN" \
                      -H "Accept: application/vnd.github+json" \
