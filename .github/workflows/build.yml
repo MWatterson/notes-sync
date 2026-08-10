@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate base64 subscription
-        run: grep -vE '^\s*(#|$)' servers.txt | base64 -w0 > sub
+        run: tr -d '\r' < servers.txt | grep -vE '^\s*(#|$)' | base64 -w0 > sub
       - name: Commit
         run: |
           git config user.name  github-actions
