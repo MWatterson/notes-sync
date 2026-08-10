@@ -11,11 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate base64 subscription
-        run: tr -d '\r' < servers.txt | grep -vE '^\s*(#|$)' | base64 -w0 > sub
+        run: |
+          tr -d '\r' < servers.txt | grep -vE '^\s*(#|$)' | base64 -w0 > sub
+          cp sub A-Link
       - name: Commit
         run: |
           git config user.name  github-actions
           git config user.email github-actions@github.com
-          git add sub
+          git add sub A-Link
           git diff --staged --quiet || git commit -m "rebuild sub"
           git push
