@@ -1,7 +1,7 @@
 name: build-sub
 on:
   push:
-    paths: ["servers.txt"]
+    paths: ["servers.txt", "users.txt", ".github/workflows/build.yml"]
   workflow_dispatch:
 permissions:
   contents: write
@@ -9,13 +9,53 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Generate base64 subscription
+      - uses: actions/checkout@v5
+
+      - name: Normalise server list
         run: |
-          tr -d '\r' < servers.txt | grep -vE '^\s*(#|$)' | base64 -w0 > sub
+          set -euo pipefail
+          tr -d '\r' < servers.txt | grep -vE '^[[:space:]]*(#|$)' > servers.clean
+          echo "servers: $(wc -l < servers.clean)"
+
+      - name: Build shared subscription
+        run: |
+          set -euo pipefail
+          base64 -w0 servers.clean > sub
           cp sub A-Link
-      - name: Commit
+
+      - name: Build per-user subscriptions
         run: |
+          set -euo pipefail
+          rm -rf out && mkdir -p out
+          tr -d '\r' < users.txt | grep -vE '^[[:space:]]*(#|$)' | while read -r token label rest; do
+            [ -n "$token" ] || continue
+            mark=$(printf '%s' " - $label" | jq -sRr @uri)
+            sed "s|\$|${mark}|" servers.clean | base64 -w0 > "out/$token"
+            echo "built out/$token  (label: $label)"
+          done
+
+      - name: Publish per-user subscriptions to secret Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: |
+          set -euo pipefail
+          files=$(for f in out/*; do
+                    jq -n --arg n "$(basename "$f")" --rawfile c "$f" '{($n): {content: $c}}'
+                  done | jq -s 'add')
+          code=$(jq -n --argjson files "$files" '{files: $files}' \
+                 | curl -sS -X PATCH \
+                     -H "Authorization: Bearer $GIST_TOKEN" \
+                     -H "Accept: application/vnd.github+json" \
+                     "https://api.github.com/gists/$GIST_ID" \
+                     -d @- -o /dev/null -w '%{http_code}')
+          echo "gist API returned $code"
+          [ "$code" = "200" ]
+
+      - name: Commit shared subscription
+        run: |
+          set -euo pipefail
+          rm -f servers.clean
           git config user.name  github-actions
           git config user.email github-actions@github.com
           git add sub A-Link
