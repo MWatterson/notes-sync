@@ -56,14 +56,19 @@ jobs:
           for r in $revoked; do echo "revoking $r"; done
           nulls=$(for r in $revoked; do jq -n --arg n "$r" '{($n): null}'; done | jq -s 'add // {}')
 
-          code=$(jq -n --argjson a "$files" --argjson b "$nulls" '{files: ($a + $b)}' \
-                 | curl -sS -X PATCH \
+          jq -n --argjson a "$files" --argjson b "$nulls" '{files: ($a + $b)}' > payload.json
+          echo "payload: $(wc -c < payload.json) bytes, $(jq '.files | length' payload.json) files"
+          code=$(curl -sS -X PATCH \
                      -H "Authorization: Bearer $GIST_TOKEN" \
                      -H "Accept: application/vnd.github+json" \
                      "https://api.github.com/gists/$GIST_ID" \
-                     -d @- -o /dev/null -w '%{http_code}')
+                     -d @payload.json -o response.json -w '%{http_code}')
           echo "gist API returned $code"
-          [ "$code" = "200" ]
+          if [ "$code" != "200" ]; then
+            echo "--- response body ---"
+            jq -r '.message? // ., (.errors? // empty)' response.json || cat response.json
+            exit 1
+          fi
 
       - name: Commit shared subscription
         run: |
