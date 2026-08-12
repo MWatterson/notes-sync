@@ -40,9 +40,12 @@ jobs:
           GIST_ID: ${{ secrets.GIST_ID }}
         run: |
           set -euo pipefail
-          files=$(for f in out/*; do
-                    jq -n --arg n "$(basename "$f")" --rawfile c "$f" '{($n): {content: $c}}'
-                  done | jq -s 'add')
+          # Everything goes through files, never through shell variables or
+          # command-line arguments: a single argv entry is capped at 128 KB and
+          # the payload outgrew that at ~20 servers x 19 subscriptions (exit 126).
+          for f in out/*; do
+            jq -n --arg n "$(basename "$f")" --rawfile c "$f" '{($n): {content: $c}}'
+          done | jq -s 'add' > files.json
 
           # Files that exist in the gist but no longer in users.txt are revoked:
           # PATCHing them to null deletes them. gistfile1.txt is the anchor a
@@ -52,11 +55,14 @@ jobs:
                "https://api.github.com/gists/$GIST_ID" \
             | jq -r '.files | keys[]' | sort > gist.current
           ls out | sort > gist.wanted
-          revoked=$(comm -23 gist.current gist.wanted | grep -vx 'gistfile1.txt' || true)
-          for r in $revoked; do echo "revoking $r"; done
-          nulls=$(for r in $revoked; do jq -n --arg n "$r" '{($n): null}'; done | jq -s 'add // {}')
+          comm -23 gist.current gist.wanted | grep -vx 'gistfile1.txt' > gist.revoked || true
+          while read -r r; do
+            [ -n "$r" ] || continue
+            echo "revoking $r" >&2
+            jq -n --arg n "$r" '{($n): null}'
+          done < gist.revoked | jq -s 'add // {}' > nulls.json
 
-          jq -n --argjson a "$files" --argjson b "$nulls" '{files: ($a + $b)}' > payload.json
+          jq -s '{files: (.[0] + .[1])}' files.json nulls.json > payload.json
           echo "payload: $(wc -c < payload.json) bytes, $(jq '.files | length' payload.json) files"
           code=$(curl -sS -X PATCH \
                      -H "Authorization: Bearer $GIST_TOKEN" \
