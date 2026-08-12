@@ -27,11 +27,16 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf out && mkdir -p out
+          # The label is watermarked invisibly: each byte becomes 8 zero-width
+          # characters appended to every server name (U+200B = 0, U+200C = 1),
+          # percent-encoded since the name lives in the URI fragment. Renders as
+          # nothing in every client, but survives copying a config out of one.
           tr -d '\r' < users.txt | grep -vE '^[[:space:]]*(#|$)' | while read -r token label rest; do
             [ -n "$token" ] || continue
-            mark=$(printf '%s' " - $label" | jq -sRr @uri)
+            mark=$(printf '%s' "$label" | xxd -b -c1 | awk '{print $2}' | tr -d '\n' \
+                   | sed -e 's/0/%E2%80%8B/g' -e 's/1/%E2%80%8C/g')
             sed "s|\$|${mark}|" servers.clean | base64 -w0 > "out/$token"
-            echo "built out/$token  (label: $label)"
+            echo "built out/$token  (label: $label, ${#mark} bytes of marker)"
           done
 
       - name: Publish per-user subscriptions to secret Gist
