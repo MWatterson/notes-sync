@@ -39,6 +39,16 @@ jobs:
             echo "built out/$token  (label: $label, ${#mark} bytes of marker)"
           done
 
+      - name: Commit shared subscription
+        run: |
+          set -euo pipefail
+          rm -f servers.clean
+          git config user.name  github-actions
+          git config user.email github-actions@github.com
+          git add sub A-Link
+          git diff --staged --quiet || git commit -m "rebuild sub"
+          git push
+
       - name: Publish per-user subscriptions to secret Gist
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
@@ -55,10 +65,17 @@ jobs:
           # Files that exist in the gist but no longer in users.txt are revoked:
           # PATCHing them to null deletes them. gistfile1.txt is the anchor a
           # gist needs to keep existing, so it is never touched.
-          curl -sS -H "Authorization: Bearer $GIST_TOKEN" \
-               -H "Accept: application/vnd.github+json" \
-               "https://api.github.com/gists/$GIST_ID" \
-            | jq -r '.files | keys[]' | sort > gist.current
+          read=$(curl -sS -H "Authorization: Bearer $GIST_TOKEN" \
+                      -H "Accept: application/vnd.github+json" \
+                      "https://api.github.com/gists/$GIST_ID" \
+                      -o gist.json -w '%{http_code}')
+          echo "reading the gist returned $read"
+          if [ "$read" != "200" ]; then
+            echo "--- response body ---"
+            jq -r '.message? // .' gist.json || cat gist.json
+            exit 1
+          fi
+          jq -r '.files | keys[]' gist.json | sort > gist.current
           ls out | sort > gist.wanted
           comm -23 gist.current gist.wanted | grep -vx 'gistfile1.txt' > gist.revoked || true
           while read -r r; do
@@ -80,13 +97,3 @@ jobs:
             jq -r '.message? // ., (.errors? // empty)' response.json || cat response.json
             exit 1
           fi
-
-      - name: Commit shared subscription
-        run: |
-          set -euo pipefail
-          rm -f servers.clean
-          git config user.name  github-actions
-          git config user.email github-actions@github.com
-          git add sub A-Link
-          git diff --staged --quiet || git commit -m "rebuild sub"
-          git push
