@@ -1,5 +1,5 @@
 # A-Link server list. Comments and blank lines are stripped at build time.
-# Names carry the numbering: a country loses its number once it is alone.
+# The list is the source; sub and A-Link next to it are built from it.
 vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@87.228.101.111:10443?encryption=none&type=grpc&security=reality&fp=firefox&sni=5post-gate.x5.ru&pbk=mmRTemhfrx-ItuDslDXSumC5wJJmfP-iqk5jPtei2Qc&sid=9a5885e0#A-Link%20Russia%20%231%20GRPC%20(WHITE%20LIST)%20%F0%9F%87%B7%F0%9F%87%BA
 vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@46.254.16.228:10443?encryption=none&type=grpc&security=reality&fp=firefox&sni=5post-gate.x5.ru&pbk=mmRTemhfrx-ItuDslDXSumC5wJJmfP-iqk5jPtei2Qc&sid=9a5885e0#A-Link%20Russia%20%232%20GRPC%20(WHITE%20LIST)%20%F0%9F%87%B7%F0%9F%87%BA
 vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@cdn-msk3.silavpn.online:443?type=xhttp&security=tls&fp=chrome&sni=cdn-msk3.silavpn.online&path=/uploadfiles/&host=cdn-msk3.silavpn.online&alpn=h2,http/1.1#A-Link%20Russia%20%233%20(WHITE%20LIST)%20%F0%9F%87%B7%F0%9F%87%BA
