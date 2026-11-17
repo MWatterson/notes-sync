@@ -31,41 +31,17 @@
     "loglevel": "warning"
   },
   "meta": {
-    "serverDescription": "Hysteria2 · 2 ноды"
+    "serverDescription": "Hysteria2 - 1 node"
   },
   "observatory": {
     "enableConcurrency": true,
     "probeInterval": "1m",
     "probeURL": "https://www.gstatic.com/generate_204",
     "subjectSelector": [
-      "FI_GAME"
+      "FI_GAME-2"
     ]
   },
   "outbounds": [
-    {
-      "protocol": "hysteria",
-      "settings": {
-        "address": "2.26.191.177",
-        "port": 20443,
-        "version": 2
-      },
-      "streamSettings": {
-        "hysteriaSettings": {
-          "auth": "cc7936af-ab33-4d8f-b803-564b4b87a21d",
-          "version": 2
-        },
-        "network": "hysteria",
-        "security": "tls",
-        "tlsSettings": {
-          "alpn": [
-            "h3"
-          ],
-          "fingerprint": "chrome",
-          "serverName": "fi7.silalink.sbs"
-        }
-      },
-      "tag": "FI_GAME"
-    },
     {
       "protocol": "hysteria",
       "settings": {
@@ -103,9 +79,9 @@
   "routing": {
     "balancers": [
       {
-        "fallbackTag": "FI_GAME",
+        "fallbackTag": "FI_GAME-2",
         "selector": [
-          "FI_GAME"
+          "FI_GAME-2"
         ],
         "strategy": {
           "type": "leastPing"
