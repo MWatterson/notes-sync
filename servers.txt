@@ -16,3 +16,5 @@ vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@31.59.178.72:443?encryption=none&fl
 vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@de23.silalink.sbs:443?encryption=none&flow=xtls-rprx-vision&type=tcp&headerType=none&security=tls&fp=chrome&sni=de23.silalink.sbs&alpn=http%2F1.1#A-Link%20GERMANY%20%233%20%F0%9F%87%A9%F0%9F%87%AA
 vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@de24.silalink.sbs:443?encryption=none&flow=xtls-rprx-vision&type=tcp&headerType=none&security=tls&fp=chrome&sni=de24.silalink.sbs&alpn=http%2F1.1#A-Link%20GERMANY%20%234%20%F0%9F%87%A9%F0%9F%87%AA
 vless://cc7936af-ab33-4d8f-b803-564b4b87a21d@nl33.silalink.sbs:443?encryption=none&flow=xtls-rprx-vision&type=tcp&headerType=none&security=tls&fp=chrome&sni=nl33.silalink.sbs&alpn=http%2F1.1#A-Link%20NETHERLANDS%20%231%20%F0%9F%87%B3%F0%9F%87%B1
+hysteria2://cc7936af-ab33-4d8f-b803-564b4b87a21d@2.26.191.177:20443/?sni=fi7.silalink.sbs&insecure=0#A-Link%20Finland%20Gaming%20%231%20%F0%9F%87%AB%F0%9F%87%AE
+hysteria2://cc7936af-ab33-4d8f-b803-564b4b87a21d@186.243.168.50:20443/?sni=fi1.silalink.sbs&insecure=0#A-Link%20Finland%20Gaming%20%232%20%F0%9F%87%AB%F0%9F%87%AE

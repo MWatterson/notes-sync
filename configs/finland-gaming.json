@@ -1,0 +1,139 @@
+{
+  "dns": {
+    "queryStrategy": "UseIPv4",
+    "servers": [
+      "1.1.1.1",
+      "1.0.0.1"
+    ]
+  },
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 10808,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true
+      },
+      "sniffing": {
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "enabled": true,
+        "routeOnly": true
+      },
+      "tag": "socks"
+    }
+  ],
+  "log": {
+    "loglevel": "warning"
+  },
+  "meta": {
+    "serverDescription": "Hysteria2 · 2 ноды"
+  },
+  "observatory": {
+    "enableConcurrency": true,
+    "probeInterval": "1m",
+    "probeURL": "https://www.gstatic.com/generate_204",
+    "subjectSelector": [
+      "FI_GAME"
+    ]
+  },
+  "outbounds": [
+    {
+      "protocol": "hysteria",
+      "settings": {
+        "address": "2.26.191.177",
+        "port": 20443,
+        "version": 2
+      },
+      "streamSettings": {
+        "hysteriaSettings": {
+          "auth": "cc7936af-ab33-4d8f-b803-564b4b87a21d",
+          "version": 2
+        },
+        "network": "hysteria",
+        "security": "tls",
+        "tlsSettings": {
+          "alpn": [
+            "h3"
+          ],
+          "fingerprint": "chrome",
+          "serverName": "fi7.silalink.sbs"
+        }
+      },
+      "tag": "FI_GAME"
+    },
+    {
+      "protocol": "hysteria",
+      "settings": {
+        "address": "186.243.168.50",
+        "port": 20443,
+        "version": 2
+      },
+      "streamSettings": {
+        "hysteriaSettings": {
+          "auth": "cc7936af-ab33-4d8f-b803-564b4b87a21d",
+          "version": 2
+        },
+        "network": "hysteria",
+        "security": "tls",
+        "tlsSettings": {
+          "alpn": [
+            "h3"
+          ],
+          "fingerprint": "chrome",
+          "serverName": "fi1.silalink.sbs"
+        }
+      },
+      "tag": "FI_GAME-2"
+    },
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
+  ],
+  "remarks": "🇫🇮 Finland (Игровой)",
+  "routing": {
+    "balancers": [
+      {
+        "fallbackTag": "FI_GAME",
+        "selector": [
+          "FI_GAME"
+        ],
+        "strategy": {
+          "type": "leastPing"
+        },
+        "tag": "FI_GAME_POOL"
+      }
+    ],
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct",
+        "type": "field"
+      },
+      {
+        "outboundTag": "block",
+        "protocol": [
+          "bittorrent"
+        ],
+        "type": "field"
+      },
+      {
+        "balancerTag": "FI_GAME_POOL",
+        "network": "tcp,udp",
+        "type": "field"
+      }
+    ]
+  }
+}
