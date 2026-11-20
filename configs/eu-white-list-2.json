@@ -1,0 +1,641 @@
+{
+  "routing": {
+    "balancers": [
+      {
+        "fallbackTag": "loopback-fallback-out",
+        "selector": [
+          "black"
+        ],
+        "tag": "BLACK_BALANCER",
+        "strategy": {
+          "settings": {
+            "maxRTT": "800ms",
+            "baselines": [
+              "200ms",
+              "400ms"
+            ],
+            "expected": 1,
+            "tolerance": 0.1
+          },
+          "type": "leastLoad"
+        }
+      }
+    ],
+    "domainStrategy": "IPOnDemand",
+    "rules": [
+      {
+        "port": "993,465",
+        "outboundTag": "direct"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "domain": [
+          "localhost",
+          "localhost.localdomain",
+          "local",
+          "*.local",
+          "*.localdomain",
+          "*.lan",
+          "*.internal"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "ip": [
+          "127.0.0.0/8",
+          "10.0.0.0/8",
+          "172.16.0.0/12",
+          "192.168.0.0/16",
+          "169.254.0.0/16",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "ip": [
+          "173.245.48.0/20",
+          "103.21.244.0/22",
+          "103.22.200.0/22",
+          "103.31.4.0/22",
+          "141.101.64.0/18",
+          "108.162.192.0/18",
+          "190.93.240.0/20",
+          "188.114.96.0/20",
+          "197.234.240.0/22",
+          "198.41.128.0/17",
+          "162.158.0.0/15",
+          "104.16.0.0/13",
+          "104.24.0.0/14",
+          "172.64.0.0/13",
+          "131.0.72.0/22",
+          "2400:cb00::/32",
+          "2606:4700::/32",
+          "2803:f800::/32",
+          "2405:b500::/32",
+          "2405:8100::/32",
+          "2a06:98c0::/29",
+          "2c0f:f248::/32"
+        ],
+        "type": "field",
+        "outboundTag": "BLACK_BALANCER"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "protocol": [
+          "bittorrent"
+        ],
+        "type": "field",
+        "outboundTag": "BLACK_BALANCER"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "balancerTag": "BLACK_BALANCER",
+        "domain": [
+          "domain:2ip.ru",
+          "domain:2ip.io",
+          "habr.com",
+          "4pda.to",
+          "4pda.ru",
+          "kemono.su",
+          "jut.su",
+          "kara.su",
+          "theins.ru",
+          "tvrain.ru",
+          "echo.msk.ru",
+          "the-village.ru",
+          "snob.ru",
+          "novayagazeta.ru",
+          "moscowtimes.ru"
+        ],
+        "type": "field"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "domain": [
+          "geosite:private",
+          "geosite:category-ru",
+          "geoip:ru",
+          "geoip:private"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "ip": [
+          "geoip:ru",
+          "geoip:private"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "inboundTag": [
+          "loopback-entry"
+        ],
+        "balancerTag": "BLACK_BALANCER",
+        "type": "field",
+        "network": "tcp,udp"
+      },
+      {
+        "inboundTag": [
+          "loopback-fallback"
+        ],
+        "type": "field",
+        "outboundTag": "proxy",
+        "network": "tcp,udp"
+      },
+      {
+        "type": "field",
+        "outboundTag": "loopback-entry-out",
+        "network": "tcp,udp"
+      }
+    ]
+  },
+  "log": {
+    "loglevel": "warning"
+  },
+  "stats": {},
+  "outbounds": [
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "stupenischool.ru",
+            "port": 1443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": ""
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "stupenischool.ru",
+          "publicKey": "sIl-pazSLnpkojc_4-tfqKa7Xm4mMjWIPKRNDJqerUw"
+        },
+        "finalmask": {
+          "tcp": [
+            {
+              "settings": {
+                "delay": "0",
+                "length": "10-20",
+                "packets": "tlshello"
+              },
+              "type": "fragment"
+            }
+          ]
+        },
+        "network": "xhttp",
+        "xhttpSettings": {
+          "mode": "packet-up",
+          "path": "/cdn/hls/10beedfc/seg",
+          "extra": {
+            "xmux": {
+              "hMaxReusableSecs": "1800-3000",
+              "hKeepAlivePeriod": 0,
+              "cMaxReuseTimes": 0,
+              "hMaxRequestTimes": "600-900",
+              "maxConcurrency": "16-32",
+              "maxConnections": 0
+            },
+            "headers": {},
+            "scMinPostsIntervalMs": 30,
+            "xPaddingBytes": "100-1000",
+            "scStreamUpServerSecs": "20-80",
+            "noGRPCHeader": false,
+            "scMaxEachPostBytes": 1000000
+          },
+          "host": "stupenischool.ru"
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "fduknew.titun.su",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "HelloChrome_133",
+          "serverName": "127.0.0.1",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "network": "tcp"
+      },
+      "tag": "black"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "fdat.titun.su",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "sun1-95.userapi.com",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "network": "tcp"
+      },
+      "tag": "black-2"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "fdfr.titun.su",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "voter.gosuslugi.ru",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "network": "tcp"
+      },
+      "tag": "black-3"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "prvtch.titun.su",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "intendant.su",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "network": "tcp"
+      },
+      "tag": "black-4"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "novonl.subv.ru",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "io.ozone.ru",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "network": "tcp"
+      },
+      "tag": "black-5"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "ee.subv.ru",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "grabar.su",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "network": "tcp"
+      },
+      "tag": "black-6"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "fdat.titun.su",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "rt.api.operator.mail.ru",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "finalmask": {
+          "tcp": [
+            {
+              "settings": {
+                "lengths": [
+                  "122-122",
+                  "2-3",
+                  "2-3",
+                  "2-3"
+                ],
+                "delays": [
+                  "10-20"
+                ],
+                "packets": "tlshello",
+                "maxSplit": "5"
+              },
+              "type": "fragment"
+            }
+          ]
+        },
+        "network": "tcp"
+      },
+      "tag": "black-7"
+    },
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "fdfr.titun.su",
+            "port": 443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "fbcc6b11-f7ba-40bb-b1d4-b329f6f3af67",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {},
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "428ef87fd47a3a32",
+          "spiderX": "/",
+          "fingerprint": "firefox",
+          "serverName": "souz.mail.ru",
+          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs"
+        },
+        "finalmask": {
+          "tcp": [
+            {
+              "settings": {
+                "lengths": [
+                  "122-122",
+                  "2-3",
+                  "2-3",
+                  "2-3"
+                ],
+                "delays": [
+                  "10-20"
+                ],
+                "packets": "tlshello",
+                "maxSplit": "5"
+              },
+              "type": "fragment"
+            }
+          ]
+        },
+        "network": "tcp"
+      },
+      "tag": "black-8"
+    },
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    },
+    {
+      "settings": {
+        "inboundTag": "loopback-entry"
+      },
+      "protocol": "loopback",
+      "tag": "loopback-entry-out"
+    },
+    {
+      "settings": {
+        "inboundTag": "loopback-fallback"
+      },
+      "protocol": "loopback",
+      "tag": "loopback-fallback-out"
+    }
+  ],
+  "dns": {
+    "servers": [
+      {
+        "address": "77.88.8.8",
+        "port": 53,
+        "domains": [
+          "geosite:category-ru",
+          "geosite:private",
+          "domain:ru",
+          "domain:xn--p1ai",
+          "domain:su"
+        ],
+        "skipFallback": true
+      },
+      "https://1.1.1.1/dns-query",
+      "https://8.8.8.8/dns-query"
+    ],
+    "tag": "dns_out",
+    "queryStrategy": "IPIfNonMatch",
+    "disableFallbackIfMatch": false
+  },
+  "burstObservatory": {
+    "subjectSelector": [
+      "black",
+      "proxy"
+    ],
+    "pingConfig": {
+      "connectivity": "",
+      "sampling": 1,
+      "destination": "http://www.gstatic.com/generate_204",
+      "interval": "120s",
+      "timeout": "3s"
+    }
+  },
+  "inbounds": [
+    {
+      "settings": {
+        "udp": true,
+        "userLevel": 8,
+        "auth": "noauth"
+      },
+      "protocol": "socks",
+      "port": 10808,
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "fakedns"
+        ]
+      },
+      "tag": "socks"
+    },
+    {
+      "settings": {
+        "userLevel": 8
+      },
+      "protocol": "http",
+      "port": 10809,
+      "tag": "http"
+    },
+    {
+      "settings": {
+        "address": "127.0.0.1",
+        "network": "tcp,udp"
+      },
+      "protocol": "dokodemo-door",
+      "port": 10901,
+      "tag": "loopback-entry",
+      "listen": "127.0.0.1"
+    },
+    {
+      "settings": {
+        "address": "127.0.0.1",
+        "network": "tcp,udp"
+      },
+      "protocol": "dokodemo-door",
+      "port": 10902,
+      "tag": "loopback-fallback",
+      "listen": "127.0.0.1"
+    }
+  ],
+  "remarks": "EU WHITE LIST 2 🇪🇺",
+  "policy": {
+    "system": {
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
+    }
+  }
+}
