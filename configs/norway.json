@@ -1,0 +1,190 @@
+{
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "protocol": [
+          "bittorrent"
+        ],
+        "type": "field",
+        "outboundTag": "block"
+      },
+      {
+        "domain": [
+          "regexp:.*\\.ru$",
+          "geosite:category-ru",
+          "domain:gate.yokkastars.com",
+          "domain:api.yokkastars.com",
+          "domain:gate.rexvpn.su",
+          "domain:gate.spotvpn.name",
+          "domain:api.spotvpn.name",
+          "domain:gate.cuirassvpn.com",
+          "domain:api.cuirassvpn.com",
+          "domain:main.vpnomni.com",
+          "domain:api.vpnomni.com",
+          "domain:vk.com",
+          "domain:vk.ru",
+          "domain:userapi.com",
+          "domain:ok.ru",
+          "domain:mycdn.me",
+          "domain:yandex.net",
+          "domain:yastatic.net",
+          "domain:ya.ru",
+          "domain:mail.ru",
+          "domain:my.mail.ru",
+          "domain:imgsmail.ru",
+          "domain:rbxcdn.com",
+          "domain:ozonusercontent.com",
+          "domain:o3.ru",
+          "domain:wildberries.ru",
+          "domain:wb.ru",
+          "domain:wbbasket.ru",
+          "domain:wbstatic.net",
+          "domain:ozon.ru",
+          "domain:avito.ru",
+          "domain:2gis.ru",
+          "domain:2gis.com",
+          "domain:gosuslugi.ru",
+          "domain:esia.gosuslugi.ru",
+          "domain:nalog.gov.ru",
+          "domain:mos.ru",
+          "domain:cbr.ru",
+          "domain:sber.ru",
+          "domain:sberbank.ru",
+          "domain:tbank.ru",
+          "domain:tinkoff.ru",
+          "domain:vtb.ru",
+          "domain:alfabank.ru",
+          "domain:mironline.ru",
+          "domain:sberbank.com",
+          "domain:dzen.ru",
+          "domain:rutube.ru",
+          "domain:kinopoisk.ru"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "ip": [
+          "geoip:ru",
+          "10.0.0.0/8",
+          "172.16.0.0/12",
+          "192.168.0.0/16",
+          "169.254.0.0/16",
+          "224.0.0.0/4",
+          "255.255.255.255"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "outboundTag": "proxy",
+        "network": "tcp,udp"
+      }
+    ],
+    "domainMatcher": "hybrid"
+  },
+  "log": {
+    "loglevel": "warning"
+  },
+  "outbounds": [
+    {
+      "settings": {
+        "vnext": [
+          {
+            "address": "193.203.10.193",
+            "port": 40443,
+            "users": [
+              {
+                "encryption": "none",
+                "id": "bf00c58b-4222-426f-b0a5-bc44c4a00387",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "protocol": "vless",
+      "streamSettings": {
+        "tcpSettings": {
+          "header": {
+            "type": "none"
+          }
+        },
+        "security": "reality",
+        "realitySettings": {
+          "shortId": "967696c677fe40d8",
+          "spiderX": "/",
+          "fingerprint": "chrome",
+          "show": false,
+          "serverName": "www.asml.com",
+          "publicKey": "EueduqqIJkllQ_LSr9wl_JmGQyBtVdyTgt0uORLvqVk"
+        },
+        "network": "tcp"
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
+  ],
+  "meta": {
+    "serverDescription": "Основной"
+  },
+  "dns": {
+    "servers": [
+      "1.1.1.1",
+      "8.8.8.8"
+    ],
+    "queryStrategy": "UseIPv4"
+  },
+  "inbounds": [
+    {
+      "settings": {
+        "udp": true,
+        "auth": "noauth",
+        "allowTransparent": false
+      },
+      "protocol": "socks",
+      "port": 10808,
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "routeOnly": false
+      },
+      "tag": "socks",
+      "listen": "127.0.0.1"
+    },
+    {
+      "settings": {
+        "udp": true,
+        "auth": "noauth",
+        "allowTransparent": false
+      },
+      "protocol": "http",
+      "port": 10809,
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "routeOnly": false
+      },
+      "tag": "http",
+      "listen": "127.0.0.1"
+    }
+  ],
+  "remarks": "A-Link NORWAY #1 🇳🇴"
+}
